@@ -2,3 +2,5 @@ tmp
 node_modules
 date-fns.org
 date-fns
+dashing.sh
+.DS_Store
