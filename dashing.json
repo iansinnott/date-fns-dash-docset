@@ -1,0 +1,11 @@
+{
+    "name": "date-fns",
+    "package": "date-fns",
+    "index": "./index.html",
+    "selectors": {
+        ".docs-content .jsdoc-header": "Function"
+    },
+    "icon32x32": "./icon@2x.png",
+    "allowJS": false,
+    "externalURL": "http://date-fns.org/docs"
+}
