@@ -7,21 +7,21 @@ const cheerio = require('cheerio');
 
 const { fromReadableStream } = require('./utils.js');
 
-const processHTML = (html) => {
+const getLinks = (html) => {
   const $ = cheerio.load(html);
 
-  const $links = $('.docs_finder-list > a')
-    .each((index, el) => {
-      console.log('sutff');
-    })
+  const links = $('.docs_finder-list > a')
+    .map((_, el) => $(el).attr('href'))
+    .toArray();
 
-  return $.html();
+  return links;
+  // return $.html();
 };
 
 const main = pipe(
   fromReadableStream,
   map(trim),
-  map(processHTML)
+  map(getLinks)
 );
 
 main(process.stdin).subscribe(
