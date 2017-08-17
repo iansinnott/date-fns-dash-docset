@@ -2,10 +2,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const { map, pipe, trim } = require('ramda');
+const { flatten, map, pipe, trim } = require('ramda');
 const cheerio = require('cheerio');
 
 const { fromReadableStream } = require('./utils.js');
+
+const toJSON = x => JSON.stringify(x, null, 2);
 
 const getLinks = (html) => {
   const $ = cheerio.load(html);
@@ -15,13 +17,14 @@ const getLinks = (html) => {
     .toArray();
 
   return links;
-  // return $.html();
 };
 
 const main = pipe(
   fromReadableStream,
   map(trim),
-  map(getLinks)
+  map(getLinks),
+  x => x.toArray(),
+  map(pipe(flatten, toJSON))
 );
 
 main(process.stdin).subscribe(
