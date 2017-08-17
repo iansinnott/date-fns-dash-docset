@@ -21,6 +21,12 @@ const fromReadableStream = (stream) => Observable.create(obs => {
   };
 });
 
+const getDocumentHTML = () => {
+  const serializer = new XMLSerializer();
+  return serializer.serializeToString(window.document);
+};
+
 module.exports = {
+  getDocumentHTML,
   fromReadableStream,
 };

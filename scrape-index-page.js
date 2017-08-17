@@ -2,13 +2,17 @@
 
 const puppeteer = require('puppeteer');
 
-(async () => {
+const { getDocumentHTML } = require('./utils.js');
+
+(async (shouldWait) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  await page.goto('https://date-fns.org/docs/Getting-Started', { waitUntil: 'networkidle' });
-  const content = await page.evaluate(() => window.document.body.innerHTML);
+  await page.goto('https://date-fns.org/docs/Getting-Started', {
+    waitUntil: shouldWait ? 'networkidle' : 'load', // 'load' is default
+  });
+  const content = await page.evaluate(getDocumentHTML);
 
   console.log(content);
 
   browser.close();
-})();
+})(true);
