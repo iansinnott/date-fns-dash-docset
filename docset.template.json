@@ -1,0 +1,10 @@
+{
+    "name": "date-fns",
+    "version": "$VERSION_SUPPLIED_BY_SCRIPT_DO_NOT_MODIFY",
+    "archive": "date-fns.tgz",
+    "author": {
+        "name": "Ian Sinnott",
+        "link": "https://twitter.com/ian_sinn"
+    },
+    "aliases": []
+}

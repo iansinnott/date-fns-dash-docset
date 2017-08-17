@@ -49,4 +49,7 @@ tmp/static/date-fns.docset: tmp/static
 	cp ./icon{,@2x}.png ./tmp/static
 	(cd ./tmp/static; ./dashing.sh build > $(outfile))
 
+dist/date-fns.tgz: tmp/static/date-fns.docset
+	./make_dist.sh
+
 .PHONY: tmp/static
