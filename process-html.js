@@ -13,6 +13,10 @@ const heredoc = pipe(trim, stripIndent);
 const processHTML = (html) => {
   const $ = cheerio.load(html);
 
+  // Strip out the redundant text from document titles
+  const $title = $('head > title');
+  $title.text($title.text().replace(' - modern JavaScript date utility library', ''))
+
   // Add custom styles
   $('head').append(heredoc(`
     <style>
