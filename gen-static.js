@@ -7,30 +7,19 @@ const fs = require('fs');
 const { Observable } = require('rxjs');
 const writeFile = Observable.bindNodeCallback(fs.writeFile);
 
-const { getDocumentHTML } = require('./utils.js');
+const { loadURL } = require('./utils.js');
 
-/**
- * NOTE: By default the headless browser will wait 1s after all network traffic
- * has ceased to declare the wait over. However, there is no guarantee the app
- * will actually be rendered at this point. It also means that even if the app
- * renders before then it will still wait. So this could be improved.
- */
-const loadURL = async (url) => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(url, { waitUntil: 'networkidle' }); // See NOTE
-  const content = await page.evaluate(getDocumentHTML);
-
-  browser.close();
-
-  return content;
-};
-
-// NOTE: The process sort of went crazy when using max concurrency. I'm sure we
-// could do more than 1 at a time but let's not overdo it
+// NOTE: The process sort of went crazy when using max concurrency. I'm not sure
+// what the max is but there's no need to push it
 const main = (urls) => {
+  // It's relatively expensive to render out all these URLs so you can run a
+  // debug mode that will only operate on a few of them.
+  if (process.env.DEBUG) {
+    urls = urls.slice(0,3);
+  }
+
   return Observable.from(urls)
-    .concatMap(relative => { // See NOTE
+    .mergeMap(relative => {
       const fullURL = `http://localhost:3111${relative}`;
       const outpath = path.resolve(`./tmp/static${relative}/index.html`);
 
@@ -47,7 +36,7 @@ const main = (urls) => {
           mkdirp.sync(path.dirname(outpath))
           return writeFile(outpath, content);
         });
-    })
+    }, 2); // See NOTE
 };
 
 main(require('./tmp/routes.json')).subscribe(
