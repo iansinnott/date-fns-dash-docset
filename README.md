@@ -38,6 +38,20 @@ Now, to build:
 make
 ```
 
+Or to rebuild:
+
+```
+make clean build
+```
+
+You can also operate in debug mode with:
+
+```
+DEBUG=true make clean build
+```
+
+This will just make the script process a few pages so that you can get a sense of whether or not everything is working as it should.
+
 ## Update
 
 Need to create an automated update strategy...
