@@ -1,18 +1,15 @@
 #!/usr/bin/env node
 
-const puppeteer = require('puppeteer');
+const { loadURL, isDebugging } = require('./utils.js');
 
-const { getDocumentHTML } = require('./utils.js');
+const main = async () => {
+  const result = await loadURL('https://date-fns.org/docs/Getting-Started');
 
-(async (shouldWait) => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto('https://date-fns.org/docs/Getting-Started', {
-    waitUntil: shouldWait ? 'networkidle' : 'load', // 'load' is default
-  });
-  const content = await page.evaluate(getDocumentHTML);
+  if (isDebugging()) {
+    console.log('Fetched page source:', result);
+  }
 
-  console.log(content);
+  console.log(result);
+};
 
-  browser.close();
-})(true);
+main();
