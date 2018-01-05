@@ -1,5 +1,7 @@
 # Run `make clean build` to rebuild
 
+SERVER_PORT = 3111
+
 all: build
 
 clean:
@@ -23,15 +25,14 @@ dashing.sh:
 	chmod +x ./dashing.sh
 
 # NOTE: This runs the static server as a background process
+# NOTE: I'm doing this all at once (with ;\ ) because I was having trouble with
+# sequencing. Make was not picking up the files created in the gen-static script
+# in the final cp command. This probably simply has to do with my understanding
+# of make, but it was very confusing and running everything this way solves it
 tmp/static: tmp/generated routes
-	node ./serve-as-spa.js ./tmp/generated/index.html &
-	./gen-static.js
-	kill $$(ps -eo pid,command | grep 'serve-as-spa' | sort | cut -d' ' -f1 | head -n 1)
-	# Copy over the getting started page as index. There is a real index page
-	# but I decided not to go for it since it seems to require JS more than the
-	# others and because it's more of a marketing page, which isn't necessary
-	# for anyone already using the lib
-	cp $$(ls -1 tmp/static/**/docs/Getting-Started/index.html | sort | tail -n 1) ./tmp/static/
+	@echo "Serving on port: $(SERVER_PORT)";\
+	PORT=$(SERVER_PORT) ./gen-static.js;\
+	cp $$(find $$(find . -iname '*Getting-Started*') -iname index.html) ./tmp/static/
 
 tmp/generated: tmp/date-fns.org
 	cp -R ./tmp/date-fns.org ./tmp/generated

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const child_process = require('child_process');
 const puppeteer = require('puppeteer');
 const mkdirp = require('mkdirp');
 const path = require('path');
@@ -9,10 +10,63 @@ const writeFile = Observable.bindNodeCallback(fs.writeFile);
 
 const { loadURL } = require('./utils.js');
 
+const PORT = process.env.PORT || 3111;
+
+const spawnServer = () => Observable.create(obs => {
+  const filepath = path.resolve('./serve-as-spa.js');
+  const htmlPath = path.resolve('./tmp/generated/index.html');
+
+  let cp;
+
+  try {
+    cp = child_process.fork(filepath, [ htmlPath ], {
+      stdio: 'pipe',
+      env: {
+        PORT,
+      },
+    });
+  } catch (err) {
+    obs.error(err);
+  }
+
+  if (cp) {
+    cp.stdout.setEncoding('utf8');
+    cp.stderr.setEncoding('utf8');
+
+    cp.stdout.on('data', data => obs.next(data));
+    cp.stderr.on('data', data => obs.error(data));
+
+    cp.on('error', err => {
+      console.error('Error -------');
+      obs.error(err);
+    });
+    cp.on('exit', () => {
+      console.error('Closed');
+      obs.complete();
+    });
+    cp.on('close', () => {
+      console.error('Closed');
+      obs.complete();
+    });
+    cp.on('disconnect', (...args) => {
+      console.error('Disconnected');
+      obs.error(args);
+    });
+  }
+
+  return () => {
+    console.log('Discarding server');
+    cp.kill();
+    cp.removeAllListeners();
+  };
+});
+
 // NOTE: The process sort of went crazy when using max concurrency. I'm not sure
 // what the max is but there's no need to push it
 // NOTE: This fully requires the site be running in spa mode on the port
 // specified
+const CONCURRENCY = 4;
+
 const main = (urls) => {
   if (urls.length === 0) {
     const msg = 'No URLs passed to gen-static. Ensure that routes were generated properly';
@@ -28,30 +82,47 @@ const main = (urls) => {
     urls = urls.slice(0,3);
   }
 
-  return Observable.from(urls)
-    .mergeMap(relative => {
-      const fullURL = `http://localhost:3111${relative}`; // See NOTE
-      const outpath = path.resolve(`./tmp/static${relative}/index.html`);
+  return spawnServer()
+    .bufferTime(1000) // Wait a sec to ensure server has started up. Also accumulate messages
+    .first() // The server never completes, so just take one since we are only really concerned with it being running before continuing
+    .mergeMap((args) => {
+      console.log(...args);
 
-      // Since the URLs are versioned there's no need to do anything if the file
-      // has already been written.
-      if (fs.existsSync(outpath)) {
-        console.log(`[Skipping] Already exists: ${outpath}`);
-        return Observable.empty();
-      }
+      return Observable.from(urls)
+        .mergeMap(relative => {
+          const fullURL = `http://localhost:${PORT}${relative}`; // See NOTE
+          const outpath = path.resolve(`./tmp/static${relative}/index.html`);
 
-      return Observable.fromPromise(loadURL(fullURL))
-        .mergeMap(content => {
-          console.log(`[Writing]: ${outpath}`);
-          mkdirp.sync(path.dirname(outpath))
-          return writeFile(outpath, content);
-        });
-    }, 2); // See NOTE
+          // Since the URLs are versioned there's no need to do anything if the file
+          // has already been written.
+          if (fs.existsSync(outpath)) {
+            console.log(`[Skipping] Already exists: ${outpath}`);
+            return Observable.empty();
+          }
+
+          return Observable.fromPromise(loadURL(fullURL))
+            .mergeMap(content => {
+              console.log(`[Writing]: ${outpath}`);
+              mkdirp.sync(path.dirname(outpath))
+              return writeFile(outpath, content);
+            });
+        }, CONCURRENCY);
+    })
 };
 
 main(require('./tmp/routes.json')).subscribe(
-  null,
-  err => console.error(err),
+  data => data && console.log('DATA', data), // Shouldn't be any data coming through
+  err => {
+    if (err.toString().includes('EADDRINUSE')) {
+      console.error('Server in use, to find blocking pid try:\n');
+      console.error(`  lsof -i :${PORT}`);
+      console.error('\nFull error below:');
+      console.error(err);
+      return;
+    }
+
+    console.error('ERR\n', err);
+  },
   () => console.log('All done.')
 );
 
