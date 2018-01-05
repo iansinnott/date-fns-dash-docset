@@ -40,7 +40,7 @@ const processHTML = (html) => {
 
   // Remove non-local scripts. These docs are meant for offline use so let's not
   // pull in any remote scripts
-  $('script[type="text/javascript"]')
+  $('script')
     .filter((i, el) => {
       const src = $(el).attr('src');
       return !/^\/assets\/js/.test(src);
