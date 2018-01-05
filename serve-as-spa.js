@@ -22,8 +22,10 @@ app.get('*', (req, res) => {
 
 const server = http.createServer(app);
 
-server.listen(3111, () => {
-  console.log('SPA server listening at http://localhost:3111');
+const PORT = process.env.PORT || 3111;
+
+server.listen(PORT, () => {
+  console.log(`SPA server listening at http://localhost:${PORT}`);
   console.log(`Index file is ${indexPath}`);
   console.log();
 });
