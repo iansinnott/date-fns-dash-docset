@@ -38,18 +38,26 @@ tmp/generated: tmp/date-fns.org
 	rm ./tmp/generated/index.html
 	cat ./tmp/date-fns.org/index.html | ./process-html.js > ./tmp/generated/index.html
 
-routes:
+tmp:
 	mkdir -p tmp
+
+node_modules:
+	yarn
+
+routes: tmp node_modules
 	./scrape-index-page.js | ./extract-routes.js > ./tmp/routes.json
 
 # NOTE: I make links absolute so that the single index page can be loaded at any
 # URL and still work. This is a spa with client side routing, so I need to
 # deliver a successful bundle regardless of the route the server sees.
-tmp/date-fns.org:
-	mkdir -p tmp
+tmp/date-fns.org: tmp
 	# Mirror the site locally
 	wget --mirror -p --convert-links -P ./tmp https://date-fns.org/
 	# Make links to assets dir absolute. See NOTE
 	sed -i '.bak' "s/'assets/'\/assets/" ./tmp/date-fns.org/index.html
 
-.PHONY: tmp/static routes
+
+
+# node_modules is phony since we need it to update, even if the dir already
+# exists
+.PHONY: tmp/static routes node_modules
