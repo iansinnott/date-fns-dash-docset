@@ -21,7 +21,12 @@ publish() {
 	local git_user=$(git config --global user.username)
 
 	# Make sure my remote is up to date
+	echo
+	echo "Entering target dir: $target_dir"
 	cd $target_dir
+
+	echo
+	echo "Making sure the repo is up to date"
 	git checkout master
 	git pull
 	git push $git_user master
@@ -32,14 +37,26 @@ publish() {
 	rm -rf docsets/date-fns/*.*
 
 	# Copy files
+	echo
+	echo "Copying files to publish"
 	cp -R $source_dir/dist/*.* docsets/date-fns/
 
 	# Commit and PR the changes
+	echo
+	echo "Git versioning"
 	git add . && git commit -m "date-fns v$version"
 	git push -u $git_user date-fns-$version
-	git pull-request -m "date-fns v$version"
+
+	if [[ ! -x $(which hub) ]]; then
+		hub pull-request -m "date-fns v$version"
+	else
+		echo "Hub not found. Hub is needed for automatic pull requests."
+	fi
+
 
 	# Restor dir
+	echo
+	echo "Restoring previous directory: $source_dir"
 	cd $source_dir
 }
 
