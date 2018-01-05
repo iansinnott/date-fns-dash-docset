@@ -2,6 +2,9 @@
 
 SERVER_PORT = 3111
 
+# Set this to wherever the dash contrib repo has been cloned locally
+LOCAL_CONTRIB_DIR = ~/dev/clones/Dash-User-Contributions
+
 all: build
 
 clean:
@@ -9,6 +12,11 @@ clean:
 	rm -rf ./dist/*
 
 build: dist/date-fns.tgz
+
+update_and_publish:
+	@./update_needed.sh && \
+	$(MAKE) clean build && \
+	./publish.sh $(LOCAL_CONTRIB_DIR)
 
 dist/date-fns.tgz: tmp/static/date-fns.docset
 	./make_dist.sh
@@ -52,10 +60,10 @@ routes: tmp node_modules
 # URL and still work. This is a spa with client side routing, so I need to
 # deliver a successful bundle regardless of the route the server sees.
 tmp/date-fns.org: tmp
-	# Mirror the site locally
-	wget --mirror -p --convert-links -P ./tmp https://date-fns.org/
+	@echo "Mirroring official docs site..."
+	wget -q --mirror -p --convert-links -P ./tmp https://date-fns.org/
 	# Make links to assets dir absolute. See NOTE
-	sed -i '.bak' "s/'assets/'\/assets/" ./tmp/date-fns.org/index.html
+	@sed -i '.bak' "s/'assets/'\/assets/" ./tmp/date-fns.org/index.html
 
 
 
