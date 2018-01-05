@@ -16,9 +16,7 @@ const fromReadableStream = (stream) => Observable.create(obs => {
 
   // Cleanup
   return () => {
-    stream.removeListener('data', next);
-    stream.removeListener('error', error);
-    stream.removeListener('end', complete);
+    stream.removeAllListeners();
   };
 });
 
