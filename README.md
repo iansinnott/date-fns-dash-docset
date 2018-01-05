@@ -54,7 +54,11 @@ This will just make the script process a few pages so that you can get a sense o
 
 ## Update
 
-Need to create an automated update strategy...
+```
+make update_and_publish
+```
+
+This will **NOT** publish anything unless a new version is detected. The script will check the current version sitting in `dist` against the latest version on NPM. Of course this is error prone of you've never built on the host system before, since the new build will place the latest docset in `dist`. In that case just run `make clean build && ./publish.sh`.
 
 ## Possible Issues
 
