@@ -42,7 +42,7 @@ tmp/static: tmp/generated routes
 	PORT=$(SERVER_PORT) ./gen-static.js;\
 	cp $$(find $$(find . -iname '*Getting-Started*') -iname index.html) ./tmp/static/
 
-tmp/generated: tmp/date-fns.org
+tmp/generated: node_modules tmp/date-fns.org
 	cp -R ./tmp/date-fns.org ./tmp/generated
 	rm ./tmp/generated/index.html
 	cat ./tmp/date-fns.org/index.html | ./process-html.js > ./tmp/generated/index.html
