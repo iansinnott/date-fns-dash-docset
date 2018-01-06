@@ -61,12 +61,12 @@ const spawnServer = () => Observable.create(obs => {
   };
 });
 
-// NOTE: The process sort of went crazy when using max concurrency. I'm not sure
-// what the max is but there's no need to push it
+// NOTE: The process sort of went crazy when using max concurrency so let's just
+// base it off core count
+const CONCURRENCY = require('os').cpus().length;
+
 // NOTE: This fully requires the site be running in spa mode on the port
 // specified
-const CONCURRENCY = 4;
-
 const main = (urls) => {
   if (urls.length === 0) {
     const msg = 'No URLs passed to gen-static. Ensure that routes were generated properly';
