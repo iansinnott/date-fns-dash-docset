@@ -37,8 +37,12 @@ const getDocumentHTML = () => {
  * will actually be rendered at this point. It also means that even if the app
  * renders before then it will still wait. So this could be improved.
  */
-const loadURL = async (url, options = { waitUntil: 'networkidle', networkIdleTimeout: 2000 }) => {
-  const browser = await puppeteer.launch();
+const loadURL = async (url, options = { waitUntil: 'networkidle', networkIdleTimeout: 5000 }) => {
+  const browser = await puppeteer.launch({
+    args: [
+      '--disable-web-security',
+    ]
+  });
   const page = await browser.newPage();
   await page.goto(url, options); // See NOTE
   const content = await page.evaluate(getDocumentHTML);

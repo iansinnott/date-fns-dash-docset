@@ -3,7 +3,7 @@
     "package": "date-fns",
     "index": "./index.html",
     "selectors": {
-        ".docs-content .jsdoc-header": "Function"
+        ".docs_finder-item.is-jsdoc h4": "Function"
     },
     "icon32x32": "./icon@2x.png",
     "allowJS": false,
