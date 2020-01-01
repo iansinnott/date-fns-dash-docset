@@ -29,7 +29,7 @@ tmp/static/date-fns.docset: dashing.sh tmp/static
 
 # Grab the dashing binary. This way we don't need go installed
 dashing.sh:
-	curl -L https://github.com/technosophos/dashing/releases/download/0.3.0/dashing > ./dashing.sh
+	curl -L https://github.com/technosophos/dashing/releases/download/0.4.0/dashing > ./dashing.sh
 	chmod +x ./dashing.sh
 
 # NOTE: This runs the static server as a background process
