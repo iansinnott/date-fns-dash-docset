@@ -1,8 +1,18 @@
 # date-fns Dash Docs
 
-[date-fns][] documentation for Dash
+---
+
+⚠️  WARNING: Unmaintained  ⚠️
+
+I no longer maintain this repo as I haven't used date-fns in years.
+
+- For a more up-to-date fork see: https://github.com/jariz-forks/date-fns-dash-docset
+- If you're interested in taking over the repo comment on [#4](https://github.com/iansinnott/date-fns-dash-docset/issues/4)
 
 ---
+
+[date-fns][] documentation for Dash
+
 <!-- Everything below this point will not be included in the dist sent to Dash -->
 
 ![date-fns in Dash](https://dropsinn.s3.amazonaws.com/Screen%20Shot%202017-08-17%20at%202.56.36%20PM.png)
